@@ -1,0 +1,6 @@
+#       MIN HR    DOM MON       DOW  STRFTIME_FMT
+	*   *     *   *         1    +3 months
+	*   *     1-7 *         1    +1 year
+	*   *     1-7 1,4,7,10  1
+	*   10-20 *   *         *    +4 days
+#	*   *     *   *         2-7  +15 days
