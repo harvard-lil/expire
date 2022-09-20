@@ -22,6 +22,12 @@ The basic idea is that files whose creation times match the crontab in
 the first five fields of a given rule are kept for the duration of the
 last field, or indefinitely if the last field is empty.
 
+Note that this kind of scheme will not necessarily play nicely with a
+group of files that have previously been thinned according to some
+other plan. For instance, a directory containing only files from the
+first of the month will get over-thinned by rules set up to keep
+Monday files.
+
 Usage
 -----
 ```
