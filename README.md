@@ -44,7 +44,7 @@ Options:
 
 Development
 -----------
-Keep it clean with `poetry run pflake8 expire.py`.
+Keep it clean with `poetry run pflake8`.
 
 Add dependencies with `poetry`, and keep `requirements.txt` up-to-date
 with `poetry export -o requirements.txt`.
@@ -53,7 +53,4 @@ Run tests with `poetry run pytest`.
 
 TODO
 ----
-Improve testing. The existing, gormless tests operate on the current
-working directory, or on subdirectories of `tmpdir`. If there's a way
-to monkeypatch file creation time, I haven't found it, and `freezegun`
-does not seem to help.
+Improve testing.
