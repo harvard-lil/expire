@@ -54,10 +54,10 @@ def expire(rules, rulefile, directory, recursive, files, dryrun):
         if not target.is_file():
             pass
 
-        dt = datetime.fromtimestamp(Path(target).stat().st_ctime)
+        ctime = datetime.fromtimestamp(Path(target).stat().st_ctime)
         now = datetime.now()
 
-        if (any([matches(dt, rule, now) for rule in rules])):
+        if (any([matches(ctime, rule, now) for rule in rules])):
             keeping = 'would keep' if dryrun else 'keeping'
             click.echo(f'{keeping} {target}')
         else:
@@ -67,10 +67,10 @@ def expire(rules, rulefile, directory, recursive, files, dryrun):
                 target.unlink()
 
 
-def matches(dt, rule, now):
+def matches(ctime, rule, now):
     return (
-        croniter.match(rule.crontab, dt) and
-        (rule.extent is None or now <= dt + rule.extent)
+        croniter.match(rule.crontab, ctime) and
+        (rule.extent is None or now <= ctime + rule.extent)
     )
 
 
