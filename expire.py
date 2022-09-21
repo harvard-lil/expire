@@ -55,7 +55,7 @@ def expire(rules, rulefile, directory, recursive, files, dryrun):
     targets = [Path(f) for f in files]
 
     if directory:
-        targets += list(Path(directory).glob('**/*' if recursive else '*'))
+        targets += sorted(Path(directory).glob('**/*' if recursive else '*'))
 
     freed = deleted = 0
 
