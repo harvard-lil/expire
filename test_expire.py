@@ -25,13 +25,13 @@ def test_help(cli_runner):
 def test_empty_directory(cli_runner, no_extent):
     with cli_runner.isolated_filesystem():
         result = cli_runner.invoke(expire, no_extent + ['-d', '.'])
-        assert result.output == ""
+        assert result.output == "warning: no files to delete\n"
 
 
 def test_empty_tmpdir(cli_runner, tmpdir, no_extent):
     tmpdir.mkdir("sub")
     result = cli_runner.invoke(expire, no_extent + ['-d', tmpdir / 'sub'])
-    assert result.output == ''
+    assert result.output == "warning: no files to delete\n"
 
 
 def test_occupied_tmpdir(cli_runner, tmpdir, no_extent):
@@ -39,14 +39,14 @@ def test_occupied_tmpdir(cli_runner, tmpdir, no_extent):
     p.write("content")
     result = cli_runner.invoke(expire, no_extent + ['-d', tmpdir / 'sub'])
     assert result.output.startswith('would keep')
-    assert result.output.strip().endswith('hello.txt')
+    assert result.output.split('\n')[0].endswith('hello.txt')
 
 
 # hmmmm -- should this raise an exception instead?
 def test_nonexistent_tmpdir(cli_runner, tmpdir, no_extent):
     tmpdir.mkdir("sub")
     result = cli_runner.invoke(expire, no_extent + ['-d', tmpdir / 'bus'])
-    assert result.output == ''
+    assert result.output == "warning: no files to delete\n"
 
 
 def test_with_freezegun(cli_runner, tmpdir, one_minute, freezer):
@@ -56,11 +56,11 @@ def test_with_freezegun(cli_runner, tmpdir, one_minute, freezer):
     p.write("content")
     result = cli_runner.invoke(expire, one_minute + ['-d', tmpdir / 'sub'])
     assert result.output.startswith('would keep')
-    assert result.output.strip().endswith('hello.txt')
+    assert result.output.split('\n')[0].endswith('hello.txt')
     freezer.move_to(str(now + two_minutes))
     result = cli_runner.invoke(expire, one_minute + ['-d', tmpdir / 'sub'])
     assert result.output.startswith('would delete')
-    assert result.output.strip().endswith('hello.txt')
+    assert result.output.split('\n')[0].endswith('hello.txt')
     assert p.read() == "content"
 
 
@@ -71,11 +71,11 @@ def test_with_freezegun_nodryrun(cli_runner, tmpdir, one_minute, freezer):
     p.write("content")
     result = cli_runner.invoke(expire, one_minute + ['-d', tmpdir / 'sub',
                                                      '--no-dryrun'])
-    assert result.output.startswith('keeping')
-    assert result.output.strip().endswith('hello.txt')
+    assert result.output.startswith('kept')
+    assert result.output.split('\n')[0].endswith('hello.txt')
     freezer.move_to(str(now + two_minutes))
     result = cli_runner.invoke(expire, one_minute + ['-d', tmpdir / 'sub',
                                                      '--no-dryrun'])
-    assert result.output.startswith('deleting')
-    assert result.output.strip().endswith('hello.txt')
+    assert result.output.startswith('deleted')
+    assert result.output.split('\n')[0].endswith('hello.txt')
     assert not p.exists()

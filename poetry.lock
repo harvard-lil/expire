@@ -25,6 +25,17 @@ colorama = {version = "*", markers = "platform_system == \"Windows\""}
 importlib-metadata = {version = "*", markers = "python_version < \"3.8\""}
 
 [[package]]
+name = "click-log"
+version = "0.4.0"
+description = "Logging integration for Click"
+category = "main"
+optional = false
+python-versions = "*"
+
+[package.dependencies]
+click = "*"
+
+[[package]]
 name = "colorama"
 version = "0.4.5"
 description = "Cross-platform colored terminal text."
@@ -67,6 +78,20 @@ python-versions = ">=3.6"
 
 [package.dependencies]
 python-dateutil = ">=2.7"
+
+[[package]]
+name = "humanize"
+version = "4.4.0"
+description = "Python humanize utilities"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+
+[package.dependencies]
+importlib-metadata = {version = "*", markers = "python_version < \"3.8\""}
+
+[package.extras]
+tests = ["freezegun", "pytest", "pytest-cov"]
 
 [[package]]
 name = "importlib-metadata"
@@ -268,15 +293,17 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "4c195bbf6580e6a50537fea2cd864ab52ec06b2c4bcd2f3ec22611e8ab244ff5"
+content-hash = "dc417179f1d1a8b240842be4ad1d30b9eda42542b55ff122bf2cea09572bf6e7"
 
 [metadata.files]
 attrs = []
 click = []
+click-log = []
 colorama = []
 croniter = []
 flake8 = []
 freezegun = []
+humanize = []
 importlib-metadata = []
 iniconfig = []
 mccabe = []

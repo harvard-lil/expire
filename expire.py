@@ -25,6 +25,12 @@ from pathlib import Path
 from datetime import datetime
 from croniter import croniter
 from dateutil.relativedelta import relativedelta
+import humanize
+import logging
+import click_log
+
+logger = logging.getLogger(__name__)
+click_log.basic_config(logger)
 
 
 @click.command()
@@ -37,6 +43,7 @@ from dateutil.relativedelta import relativedelta
 @click.option('--files', '-f', multiple=True,
               help='A single file to be considered for deletion (repeatable)')
 @click.option('--dryrun/--no-dryrun', default=True, show_default=True)
+@click_log.simple_verbosity_option(logger)
 def expire(rules, rulefile, directory, recursive, files, dryrun):
     """ A tool for expiring old backups. """
     rules = [make_rule(r) for r in rules]
@@ -50,6 +57,8 @@ def expire(rules, rulefile, directory, recursive, files, dryrun):
     if directory:
         targets += list(Path(directory).glob('**/*' if recursive else '*'))
 
+    freed = deleted = 0
+
     for target in targets:
         if not target.is_file():
             pass
@@ -58,13 +67,21 @@ def expire(rules, rulefile, directory, recursive, files, dryrun):
         now = datetime.now()
 
         if (any([matches(ctime, rule, now) for rule in rules])):
-            keeping = 'would keep' if dryrun else 'keeping'
-            click.echo(f'{keeping} {target}')
+            keeping = 'would keep' if dryrun else 'kept'
+            logger.info(f'{keeping} {target}')
         else:
-            deleting = 'would delete' if dryrun else 'deleting'
-            click.echo(f'{deleting} {target}')
+            deleted += 1
+            freed += Path(target).stat().st_size
+            deleting = 'would delete' if dryrun else 'deleted'
+            logger.info(f'{deleting} {target}')
             if not dryrun:
                 target.unlink()
+
+    if deleted:
+        logger.warning(f'{deleting} {deleted} files occupying '
+                       f'{humanize.naturalsize(freed)}')
+    else:
+        logger.warning('no files to delete')
 
 
 def matches(ctime, rule, now):
