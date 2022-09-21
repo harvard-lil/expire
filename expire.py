@@ -71,6 +71,9 @@ def matches(ctime, rule, now):
     return (
         croniter.match(rule.crontab, ctime) and
         (rule.extent is None or now <= ctime + rule.extent)
+        # it would be clearer to express this as
+        #   now - ctime <= rule.extent,
+        # but you can't compare a datetime.timedelta with a relativedelta
     )
 
 
@@ -81,8 +84,8 @@ def make_rule(line):
 def make_delta(s):
     """
     This is not ideal, but I don't think there's a more clear
-    translation of the "STRFTIME_FMT" field to a timedelta, especially
-    when months are concerned.
+    translation of the "STRFTIME_FMT" field to a time difference,
+    especially when months are concerned.
     """
     v, k = s.split()
     if 'minute' in k:
