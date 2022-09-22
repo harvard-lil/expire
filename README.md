@@ -40,7 +40,7 @@ pip install git+https://github.com/harvard-lil/expire#egg=expire
 Usage
 -----
 ```
-% expire --help
+$ expire --help
 Usage: expire [OPTIONS]
 
   A tool for expiring old backups.
@@ -54,8 +54,15 @@ Options:
   -f, --files TEXT              A single file to be considered for deletion
                                 (repeatable)
   --dryrun / --no-dryrun        [default: dryrun]
+  -v, --verbosity LVL           Either CRITICAL, ERROR, WARNING, INFO or DEBUG
   --help                        Show this message and exit.
 ```
+
+Typically, you would run with `--rules` or `--rulefile` (or both) and
+`--directory` or `--files` (or both) with the implicit defaults for
+`--dryrun` and `--verbosity`, in order to see what would happen; then
+you might run the same command again with `--no-dryrun --verbosity
+WARNING` to perform the actual deletion.
 
 Development
 -----------
