@@ -11,12 +11,12 @@
 #	*   *     *   *         2-7  +15 days
 
 
-The expire-rule stanza is for refining how long before a backup
-expires; e.g. the first line has "1" for DOW (day of week),
-i.e. Monday. Hence backups made on a Monday will stay around for 3
-months. The second line says that backups made in the first week of
-the month (DOM = day of month) won't expire until after one year. An
-empty time spec is the same as "never".
+> The expire-rule stanza is for refining how long before a backup
+> expires; e.g. the first line has "1" for DOW (day of week),
+> i.e. Monday. Hence backups made on a Monday will stay around for 3
+> months. The second line says that backups made in the first week of
+> the month (DOM = day of month) won't expire until after one year. An
+> empty time spec is the same as "never".
 
 """
 
@@ -28,6 +28,7 @@ from dateutil.relativedelta import relativedelta
 import humanize
 import logging
 import click_log
+import sys
 
 logger = logging.getLogger(__name__)
 click_log.basic_config(logger)
@@ -85,13 +86,19 @@ def expire(rules, rulefile, directory, recursive, files, dryrun):
 
 
 def matches(ctime, rule, now):
-    return (
-        croniter.match(rule.crontab, ctime) and
-        (rule.extent is None or now <= ctime + rule.extent)
-        # it would be clearer to express this as
-        #   now - ctime <= rule.extent,
-        # but you can't compare a datetime.timedelta with a relativedelta
-    )
+    try:
+        return (
+            croniter.match(rule.crontab, ctime) and
+            (rule.extent is None or now <= ctime + rule.extent)
+            # it would be clearer to express this as
+            #   now - ctime <= rule.extent,
+            # but you can't compare a datetime.timedelta with a relativedelta
+        )
+    except Exception as e:
+        # this Exception is really a croniter error, but croniter doesn't
+        # expose CroniterError -- only several specific errors
+        logger.error(e)
+        sys.exit(1)
 
 
 def make_rule(line):
