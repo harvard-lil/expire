@@ -1,6 +1,5 @@
 expire
 ======
-
 This is a program for expiring old backup files. It is modeled on
 `dirvish-expire`, part of [dirvish](https://dirvish.org/), a rotating
 backup system. A good explanation of the expiration rules is in the
@@ -28,10 +27,20 @@ other plan. For instance, a directory containing only files from the
 first of the month will get over-thinned by rules set up to keep
 Monday files.
 
+Installation
+------------
+For regular use, start a virtual environment and install this package
+and its requirements, something like this:
+```
+python3 -m venv env
+. env/bin/activate
+pip install git+https://github.com/harvard-lil/expire#egg=expire
+```
+
 Usage
 -----
 ```
-% poetry run expire --help
+% expire --help
 Usage: expire [OPTIONS]
 
   A tool for expiring old backups.
@@ -50,10 +59,19 @@ Options:
 
 Development
 -----------
+For development, [install
+Poetry](https://python-poetry.org/docs/#installation) and clone this
+repository. Then, in the repo's directory, install the package and its
+requirements like this:
+
+```
+poetry install
+```
+
 Keep it clean with `poetry run pflake8`.
 
-Add dependencies with `poetry`, and keep `requirements.txt` up-to-date
-with `poetry export -o requirements.txt`.
+Add dependencies with `poetry add`, and keep `requirements.txt`
+up-to-date with `poetry export -o requirements.txt`.
 
 Run tests with `poetry run pytest`.
 
