@@ -83,31 +83,12 @@ def expire(rules, rulefile, directory, recursive, files, dryrun):
         logger.warning('no files to delete')
 
 
-def make_delta(s):
-    """
-    This is not ideal, but I don't think there's a more clear
-    translation of the "STRFTIME_FMT" field to a time difference,
-    especially when months are concerned.
-    """
-    v, k = s.split()
-    if 'minute' in k:
-        return relativedelta(minutes=int(v))
-    elif 'day' in k:
-        return relativedelta(days=int(v))
-    elif 'month' in k:
-        return relativedelta(months=int(v))
-    elif 'year' in k:
-        return relativedelta(years=int(v))
-    else:
-        raise Exception(f'Bad extent: {s}')
-
-
 class Rule():
     def __init__(self, line):
         parts = line.strip().split(maxsplit=5)
         self.crontab = ' '.join(parts[0:5])
         try:
-            self.extent = make_delta(parts[5])
+            self.extent = self._make_delta(parts[5])
         except IndexError:
             self.extent = None
 
@@ -125,6 +106,33 @@ class Rule():
             # not expose CroniterError -- only several specific errors
             logger.error(e)
             sys.exit(1)
+
+    def _make_delta(self, s):
+        """
+        This is not ideal, but I don't think there's a more clear
+        translation of the "STRFTIME_FMT" field to a time difference,
+        especially when months are concerned.
+        """
+        try:
+            v, k = s.split()
+        except ValueError as e:
+            logger.error(f'Bad extent "{s}": {e}')
+            sys.exit()
+        try:
+            if 'minute' in k:
+                return relativedelta(minutes=int(v))
+            elif 'day' in k:
+                return relativedelta(days=int(v))
+            elif 'month' in k:
+                return relativedelta(months=int(v))
+            elif 'year' in k:
+                return relativedelta(years=int(v))
+            else:
+                logger.error(f'Bad extent "{s}"')
+                sys.exit()
+        except ValueError as e:
+            logger.error(f'Bad extent "{s}": {e}')
+            sys.exit()
 
 
 if __name__ == '__main__':
