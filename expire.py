@@ -67,7 +67,7 @@ def expire(rules, rulefile, directory, recursive, files, dryrun):
         ctime = datetime.fromtimestamp(Path(target).stat().st_ctime)
         now = datetime.now()
 
-        if (any([matches(ctime, rule, now) for rule in rules])):
+        if (any([rule.matches(ctime, now) for rule in rules])):
             keeping = 'would keep' if dryrun else 'kept'
             logger.info(f'{keeping} {target}')
         else:
@@ -83,22 +83,6 @@ def expire(rules, rulefile, directory, recursive, files, dryrun):
                        f'{humanize.naturalsize(freed)}')
     else:
         logger.warning('no files to delete')
-
-
-def matches(ctime, rule, now):
-    try:
-        return (
-            croniter.match(rule.crontab, ctime) and
-            (rule.extent is None or now <= ctime + rule.extent)
-            # it would be clearer to express this as
-            #   now - ctime <= rule.extent,
-            # but you can't compare a datetime.timedelta with a relativedelta
-        )
-    except Exception as e:
-        # this Exception is really a croniter error, but croniter doesn't
-        # expose CroniterError -- only several specific errors
-        logger.error(e)
-        sys.exit(1)
 
 
 def make_rule(line):
@@ -131,6 +115,21 @@ class Rule():
             self.extent = make_delta(parts[5])
         except IndexError:
             self.extent = None
+
+    def matches(self, ctime, now):
+        try:
+            return (
+                croniter.match(self.crontab, ctime) and
+                (self.extent is None or now <= ctime + self.extent)
+                # it would be clearer to express this as
+                #   now - ctime <= self.extent,
+                # but you can't compare a timedelta with a relativedelta
+            )
+        except Exception as e:
+            # this Exception is really a croniter error, but croniter doesn't
+            # expose CroniterError -- only several specific errors
+            logger.error(e)
+            sys.exit(1)
 
 
 if __name__ == '__main__':
