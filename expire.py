@@ -47,10 +47,10 @@ click_log.basic_config(logger)
 @click_log.simple_verbosity_option(logger)
 def expire(rules, rulefile, directory, recursive, files, dryrun):
     """ A tool for expiring old backups. """
-    rules = [make_rule(r) for r in rules]
+    rules = [Rule(r) for r in rules]
 
     if rulefile:
-        rules += [make_rule(line) for line in rulefile.readlines()
+        rules += [Rule(line) for line in rulefile.readlines()
                   if not line.lstrip().startswith('#')]
 
     targets = [Path(f) for f in files]
@@ -85,10 +85,6 @@ def expire(rules, rulefile, directory, recursive, files, dryrun):
         logger.warning('no files to delete')
 
 
-def make_rule(line):
-    return Rule(line.strip().split(maxsplit=5))
-
-
 def make_delta(s):
     """
     This is not ideal, but I don't think there's a more clear
@@ -109,7 +105,8 @@ def make_delta(s):
 
 
 class Rule():
-    def __init__(self, parts):
+    def __init__(self, line):
+        parts = line.strip().split(maxsplit=5)
         self.crontab = ' '.join(parts[0:5])
         try:
             self.extent = make_delta(parts[5])
