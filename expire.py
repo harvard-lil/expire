@@ -59,11 +59,11 @@ def expire(rules, rulefile, directory, recursive, files, dryrun):
         targets += sorted(Path(directory).glob('**/*' if recursive else '*'))
 
     freed = deleted = 0
+    now = datetime.now()
 
     for target in targets:
         if target.is_file():
             ctime = datetime.fromtimestamp(Path(target).stat().st_ctime)
-            now = datetime.now()
 
             if (any([rule.matches(ctime, now) for rule in rules])):
                 keeping = 'would keep' if dryrun else 'kept'
