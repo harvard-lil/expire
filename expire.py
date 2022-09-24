@@ -61,20 +61,19 @@ def expire(rules, rulefile, directory, recursive, files, dryrun):
     freed = deleted = 0
     now = datetime.now()
 
-    for target in targets:
-        if target.is_file():
-            ctime = datetime.fromtimestamp(Path(target).stat().st_ctime)
+    for target in [t for t in targets if t.is_file()]:
+        ctime = datetime.fromtimestamp(Path(target).stat().st_ctime)
 
-            if (any([rule.matches(ctime, now) for rule in rules])):
-                keeping = 'would keep' if dryrun else 'kept'
-                logger.info(f'{keeping} {target}')
-            else:
-                deleted += 1
-                freed += Path(target).stat().st_size
-                deleting = 'would delete' if dryrun else 'deleted'
-                logger.info(f'{deleting} {target}')
-                if not dryrun:
-                    target.unlink()
+        if (any([rule.matches(ctime, now) for rule in rules])):
+            keeping = 'would keep' if dryrun else 'kept'
+            logger.info(f'{keeping} {target}')
+        else:
+            deleted += 1
+            freed += Path(target).stat().st_size
+            deleting = 'would delete' if dryrun else 'deleted'
+            logger.info(f'{deleting} {target}')
+            if not dryrun:
+                target.unlink()
 
     if deleted:
         logger.warning(f'{deleting} {deleted} files occupying '
