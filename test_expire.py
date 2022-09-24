@@ -73,6 +73,7 @@ def test_with_freezegun_nodryrun(cli_runner, tmpdir, one_minute, freezer):
                                                      '--no-dryrun'])
     assert result.output.startswith('kept')
     assert result.output.split('\n')[0].endswith('hello.txt')
+    assert p.read() == "content"
     freezer.move_to(str(now + two_minutes))
     result = cli_runner.invoke(expire, one_minute + ['-d', tmpdir / 'sub',
                                                      '--no-dryrun'])
