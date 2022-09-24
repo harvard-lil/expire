@@ -50,14 +50,14 @@ def test_nonexistent_tmpdir(cli_runner, tmpdir, no_extent):
 
 
 def test_with_freezegun(cli_runner, tmpdir, one_minute, freezer):
-    now = datetime.now()
-    two_minutes = timedelta(minutes=2)
     p = tmpdir.mkdir("sub").join("hello.txt")
     p.write("content")
     result = cli_runner.invoke(expire, one_minute + ['-d', tmpdir / 'sub'])
     assert result.output.startswith('would keep')
     assert result.output.split('\n')[0].endswith('hello.txt')
-    freezer.move_to(str(now + two_minutes))
+
+    freezer.move_to(str(datetime.now() + timedelta(minutes=2)))
+
     result = cli_runner.invoke(expire, one_minute + ['-d', tmpdir / 'sub'])
     assert result.output.startswith('would delete')
     assert result.output.split('\n')[0].endswith('hello.txt')
@@ -65,8 +65,6 @@ def test_with_freezegun(cli_runner, tmpdir, one_minute, freezer):
 
 
 def test_with_freezegun_nodryrun(cli_runner, tmpdir, one_minute, freezer):
-    now = datetime.now()
-    two_minutes = timedelta(minutes=2)
     p = tmpdir.mkdir("sub").join("hello.txt")
     p.write("content")
     result = cli_runner.invoke(expire, one_minute + ['-d', tmpdir / 'sub',
@@ -74,7 +72,9 @@ def test_with_freezegun_nodryrun(cli_runner, tmpdir, one_minute, freezer):
     assert result.output.startswith('kept')
     assert result.output.split('\n')[0].endswith('hello.txt')
     assert p.read() == "content"
-    freezer.move_to(str(now + two_minutes))
+
+    freezer.move_to(str(datetime.now() + timedelta(minutes=2)))
+
     result = cli_runner.invoke(expire, one_minute + ['-d', tmpdir / 'sub',
                                                      '--no-dryrun'])
     assert result.output.startswith('deleted')
