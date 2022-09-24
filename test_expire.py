@@ -61,6 +61,8 @@ def test_with_freezegun(cli_runner, tmpdir, one_minute, freezer):
     result = cli_runner.invoke(expire, one_minute + ['-d', tmpdir / 'sub'])
     assert result.output.startswith('would delete')
     assert result.output.split('\n')[0].endswith('hello.txt')
+    warning = 'warning: would delete 1 file occupying 7 Bytes'
+    assert result.output.split('\n')[1] == warning
     assert p.read() == "content"
 
 
@@ -79,4 +81,6 @@ def test_with_freezegun_nodryrun(cli_runner, tmpdir, one_minute, freezer):
                                                      '--no-dryrun'])
     assert result.output.startswith('deleted')
     assert result.output.split('\n')[0].endswith('hello.txt')
+    warning = 'warning: deleted 1 file occupying 7 Bytes'
+    assert result.output.split('\n')[1] == warning
     assert not p.exists()

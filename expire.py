@@ -25,7 +25,7 @@ from pathlib import Path
 from datetime import datetime
 from croniter import croniter
 from dateutil.relativedelta import relativedelta
-import humanize
+from humanize import naturalsize
 import logging
 import click_log
 import sys
@@ -76,8 +76,9 @@ def expire(rules, rulefile, directory, recursive, files, dryrun):
                 target.unlink()
 
     if deleted:
-        logger.warning(f'{deleting} {deleted} files occupying '
-                       f'{humanize.naturalsize(freed)}')
+        s = 's' if deleted > 1 else ''
+        logger.warning(f'{deleting} {deleted} file{s} occupying '
+                       f'{naturalsize(freed)}')
     else:
         logger.warning('no files to delete')
 
