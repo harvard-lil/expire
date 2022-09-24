@@ -51,7 +51,7 @@ def expire(rules, rulefile, directory, recursive, files, dryrun):
 
     if rulefile:
         rules += [Rule(line) for line in rulefile.readlines()
-                  if not line.lstrip().startswith('#')]
+                  if not line.lstrip().startswith('#') and line.strip()]
 
     targets = [Path(f) for f in files]
 
